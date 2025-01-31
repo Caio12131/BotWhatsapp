@@ -1,6 +1,7 @@
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
+const path = require('path'); // Adicionado para usar caminhos relativos
 
 const client = new Client({
     puppeteer: {
@@ -34,7 +35,7 @@ client.on('message', async (message) => {
 
         setTimeout(async () => {
             try {
-                const audioPath = path.join(__dirname, 'audio.mp3'); 
+                const audioPath = path.join(__dirname, 'audio.mp3'); // Caminho relativo para o áudio
                 console.log(`Verificando se o arquivo de áudio existe em: ${audioPath}`);
                 
                 // Verificar se o arquivo de áudio existe
@@ -58,7 +59,6 @@ client.on('message', async (message) => {
                 console.error(error.stack); // Log completo do erro para rastrear a origem
             }
         }, delay);
-        
     }
 
     // Envia uma mensagem automática de texto após receber qualquer mensagem
