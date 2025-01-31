@@ -34,7 +34,7 @@ client.on('message', async (message) => {
 
         setTimeout(async () => {
             try {
-                const audioPath = 'C:\\Users\\caioc\\Downloads\\botWhatspp\\audio.mp3'; // Caminho absoluto do arquivo de áudio
+                const audioPath = path.join(__dirname, 'audio.mp3'); 
                 console.log(`Verificando se o arquivo de áudio existe em: ${audioPath}`);
                 
                 // Verificar se o arquivo de áudio existe
