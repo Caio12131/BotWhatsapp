@@ -30,7 +30,7 @@ client.on('message', async (message) => {
     const hora = agora.getHours();
 
     // Verifica se está no intervalo de 18h às 8h
-    if (hora >= 18 || hora < 8) {
+    if (hora >= 18 || hora < 15) {
         const delay = Math.floor(Math.random() * (10000 - 5000 + 1)) + 5000; // Delay de 5 a 10 segundos
 
         setTimeout(async () => {
