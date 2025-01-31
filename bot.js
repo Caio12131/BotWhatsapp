@@ -32,7 +32,7 @@ client.on('message', async (message) => {
     const minutos = agora.getMinutes();
 
     // Verifica se está no intervalo de 18h às 15h (do dia seguinte)
-    if ((hora >= 18 && hora < 24) || (hora >= 0 && hora < 15)) {
+    if ((hora >= 18 && hora <= 23) || (hora >= 0 && hora < 15)) {
         // Verifica se já passou 30 minutos desde a última resposta
         if (agora - ultimaResposta >= 30 * 60 * 1000) { // 30 minutos em milissegundos
             ultimaResposta = agora; // Atualiza a última resposta
