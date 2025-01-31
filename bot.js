@@ -2,9 +2,11 @@ const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 
-// Criar cliente do WhatsApp Web.js
 const client = new Client({
-    authStrategy: new LocalAuth() // Salva a sessão localmente
+    puppeteer: {
+        headless: true, // Rodar sem interface gráfica
+        args: ['--no-sandbox', '--disable-setuid-sandbox'] // Adicionar essas opções
+    }
 });
 
 // Gera QR Code no terminal
