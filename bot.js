@@ -6,7 +6,8 @@ const client = new Client({
     puppeteer: {
         headless: true, // Rodar sem interface gráfica
         args: ['--no-sandbox', '--disable-setuid-sandbox'] // Adicionar essas opções
-    }
+    },
+    authStrategy: new LocalAuth() // Usar autenticação local para evitar a necessidade de escanear QR frequentemente
 });
 
 // Gera QR Code no terminal
@@ -28,7 +29,7 @@ client.on('message', async (message) => {
     const hora = agora.getHours();
 
     // Verifica se está no intervalo de 18h às 8h
-    if (hora >= 18 || hora < 10) {
+    if (hora >= 18 || hora < 12) {
         const delay = Math.floor(Math.random() * (10000 - 5000 + 1)) + 5000; // Delay de 5 a 10 segundos
 
         setTimeout(async () => {
@@ -59,12 +60,22 @@ client.on('message', async (message) => {
         }, delay);
         
     }
+
+    // Envia uma mensagem automática de texto após receber qualquer mensagem
+    await client.sendMessage(message.from, "Mensagem Automática Enviada");
 });
 
-// Testa envio de mensagem de texto
-client.on('message', async (message) => {
-    await client.sendMessage(message.from, "Mensagem Automática Enviada");
+// Para tentar reconectar automaticamente caso o bot seja desconectado
+client.on('disconnected', (reason) => {
+    console.log('Bot desconectado. Tentando reconectar...', reason);
+    client.initialize(); // Reconnecta automaticamente
 });
 
 // Inicia o bot
 client.initialize();
+
+// Manter o processo rodando na Railway (garante que o processo não será finalizado)
+process.on('SIGINT', () => {
+    console.log('Processo finalizado');
+    client.destroy(); // Finaliza o cliente corretamente antes de sair
+});
