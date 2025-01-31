@@ -30,7 +30,7 @@ client.on('message', async (message) => {
     const hora = agora.getHours();
 
     // Verifica se está no intervalo de 18h às 8h
-    if (hora >= 18 || hora < 12) {
+    if (hora >= 18 || hora < 15) {
         const delay = Math.floor(Math.random() * (10000 - 5000 + 1)) + 5000; // Delay de 5 a 10 segundos
 
         setTimeout(async () => {
@@ -58,7 +58,7 @@ client.on('message', async (message) => {
                 console.error(`Erro ao enviar áudio: ${error.message}`);
                 console.error(error.stack); // Log completo do erro para rastrear a origem
             }
-        }, delay); // Garante o delay de 5 a 10 segundos antes de enviar o áudio
+        }, delay);
     }
 
     // Envia uma mensagem automática de texto após receber qualquer mensagem
