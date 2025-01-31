@@ -1,7 +1,7 @@
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
-const path = require('path'); // Adicionado para usar caminhos relativos
+const path = require('path'); // Usar caminho relativo
 
 const client = new Client({
     puppeteer: {
@@ -30,12 +30,12 @@ client.on('message', async (message) => {
     const hora = agora.getHours();
 
     // Verifica se está no intervalo de 18h às 8h
-    if (hora >= 18 || hora < 12) {
+    if (hora >= 18 || hora < 15) {
         const delay = Math.floor(Math.random() * (10000 - 5000 + 1)) + 5000; // Delay de 5 a 10 segundos
 
         setTimeout(async () => {
             try {
-                const audioPath = path.join(__dirname, 'audio.mp3'); // Caminho relativo para o áudio
+                const audioPath = './audio.mp3'; // Caminho relativo para o áudio
                 console.log(`Verificando se o arquivo de áudio existe em: ${audioPath}`);
                 
                 // Verificar se o arquivo de áudio existe
@@ -44,7 +44,7 @@ client.on('message', async (message) => {
                     return;
                 }
         
-                console.log(`Arquivo de áudio encontrado. Enviando áudio para ${message.from} em ${delay / 1000} segundos...`);
+                console.log(`Arquivo de áudio encontrado em: ${audioPath}. Enviando áudio para ${message.from} em ${delay / 1000} segundos...`);
         
                 // Usando MessageMedia.fromFilePath para carregar o áudio
                 const media = MessageMedia.fromFilePath(audioPath);
