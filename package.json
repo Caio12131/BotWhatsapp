@@ -1,0 +1,24 @@
+{
+  "name": "botwpp",
+  "version": "1.0.0",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Caio12131/BotWhatsapp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Caio12131/BotWhatsapp/issues"
+  },
+  "homepage": "https://github.com/Caio12131/BotWhatsapp#readme",
+  "description": "",
+  "dependencies": {
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.26.0"
+  }
+}
