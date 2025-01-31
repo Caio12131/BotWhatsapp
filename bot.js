@@ -35,8 +35,8 @@ client.on('message', async (message) => {
     // Obtém o número do remetente
     const numero = message.from;
 
-    // Verifica se está no intervalo de 18h às 15h
-    if (hora >= 18 || hora < 15) {
+    // Verifica se está no intervalo de 18h às 08h
+    if (hora >= 18 || hora < 8) {
         // Se o número já recebeu resposta hoje, ignora as próximas mensagens
         if (ultimasRespostas[numero] === dataHoje) {
             console.log(`Ignorando mensagem de ${numero}, pois já foi respondido hoje.`);
@@ -79,7 +79,7 @@ client.on('message', async (message) => {
         // Envia uma mensagem automática de texto junto com o áudio
         await client.sendMessage(numero, "Mensagem Automática Enviada");
     } else {
-        console.log("Fora do intervalo de 18h às 15h, não enviando áudio.");
+        console.log("Fora do intervalo de 18h às 08h, não enviando áudio.");
     }
 });
 
