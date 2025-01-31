@@ -1,7 +1,8 @@
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
-const path = require('path'); // Usar caminho relativo
+const path = require('path');
+const moment = require('moment-timezone'); // Importa a biblioteca moment-timezone
 
 const client = new Client({
     puppeteer: {
@@ -27,8 +28,8 @@ client.on('ready', () => {
 
 // Detecta mensagens recebidas
 client.on('message', async (message) => {
-    const agora = new Date();
-    const hora = agora.getHours();
+    const agora = moment.tz('America/Sao_Paulo'); // Pega o horário ajustado para o Brasil
+    const hora = agora.hours(); // Hora atual no Brasil
 
     // Verifica se está no intervalo de 18h às 15h
     if ((hora >= 18 || hora < 15)) {
