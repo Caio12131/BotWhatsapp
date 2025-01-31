@@ -2,18 +2,18 @@ const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const path = require('path');
-const moment = require('moment-timezone'); // Importa a biblioteca moment-timezone
+const moment = require('moment-timezone'); // Biblioteca para ajustar o fuso horário
 
 const client = new Client({
     puppeteer: {
         headless: true, // Rodar sem interface gráfica
-        args: ['--no-sandbox', '--disable-setuid-sandbox'] // Adicionar essas opções
+        args: ['--no-sandbox', '--disable-setuid-sandbox'] // Evita erros no servidor
     },
-    authStrategy: new LocalAuth() // Usar autenticação local para evitar a necessidade de escanear QR frequentemente
+    authStrategy: new LocalAuth() // Mantém a autenticação sem precisar escanear QR sempre
 });
 
-// Variável para armazenar o horário da última resposta
-let ultimaResposta = 0;
+// Armazena a última resposta de cada número
+const ultimasRespostas = {};
 
 // Gera QR Code no terminal
 client.on('qr', (qr) => {
@@ -28,22 +28,26 @@ client.on('ready', () => {
 
 // Detecta mensagens recebidas
 client.on('message', async (message) => {
-    const agora = moment.tz('America/Sao_Paulo'); // Pega o horário ajustado para o Brasil
-    const hora = agora.hours(); // Hora atual no Brasil
+    const agora = moment.tz('America/Sao_Paulo'); // Pega o horário do Brasil
+    const hora = agora.hours(); // Obtém a hora no Brasil
+
+    // Obtém o número do remetente
+    const numero = message.from;
 
     // Verifica se está no intervalo de 18h às 15h
-    if ((hora >= 18 || hora < 15)) {
-        // Verifica se já passou 30 minutos desde a última resposta
-        if (agora - ultimaResposta >= 30 * 60 * 1000) { // 30 minutos em milissegundos
-            ultimaResposta = agora; // Atualiza a última resposta
+    if (hora >= 18 || hora < 15) {
+        // Verifica se o número já foi respondido nos últimos 30 minutos
+        if (!ultimasRespostas[numero] || agora.diff(ultimasRespostas[numero], 'minutes') >= 30) {
+            // Atualiza o último horário de resposta para este número
+            ultimasRespostas[numero] = agora;
 
-            console.log(`Mensagem recebida de ${message.from}: ${message.body}`); // Log da mensagem recebida
+            console.log(`Mensagem recebida de ${numero}: ${message.body}`);
 
             const delay = Math.floor(Math.random() * (10000 - 5000 + 1)) + 5000; // Delay de 5 a 10 segundos
 
             setTimeout(async () => {
                 try {
-                    const audioPath = './audio.mp3'; // Caminho relativo para o áudio
+                    const audioPath = './audio.mp3'; // Caminho do arquivo de áudio
                     console.log(`Verificando se o arquivo de áudio existe em: ${audioPath}`);
                     
                     // Verificar se o arquivo de áudio existe
@@ -52,7 +56,7 @@ client.on('message', async (message) => {
                         return;
                     }
             
-                    console.log(`Arquivo de áudio encontrado em: ${audioPath}. Enviando áudio para ${message.from} em ${delay / 1000} segundos...`);
+                    console.log(`Arquivo de áudio encontrado. Enviando para ${numero} em ${delay / 1000} segundos...`);
             
                     // Usando MessageMedia.fromFilePath para carregar o áudio
                     const media = MessageMedia.fromFilePath(audioPath);
@@ -60,18 +64,17 @@ client.on('message', async (message) => {
                     console.log('Áudio carregado com sucesso. Enviando...');
             
                     // Enviar áudio
-                    await client.sendMessage(message.from, media, { sendAudioAsVoice: true });
-                    console.log(`Áudio enviado para ${message.from}`);
+                    await client.sendMessage(numero, media, { sendAudioAsVoice: true });
+                    console.log(`Áudio enviado para ${numero}`);
                 } catch (error) {
                     console.error(`Erro ao enviar áudio: ${error.message}`);
-                    console.error(error.stack); // Log completo do erro para rastrear a origem
                 }
-            }, delay); // Garante o delay de 5 a 10 segundos antes de enviar o áudio
+            }, delay);
 
-            // Envia uma mensagem automática de texto após receber qualquer mensagem
-            await client.sendMessage(message.from, "Mensagem Automática Enviada");
+            // Envia uma mensagem automática de texto junto com o áudio
+            await client.sendMessage(numero, "Mensagem Automática Enviada");
         } else {
-            console.log("Aguarde 30 minutos para enviar outra resposta.");
+            console.log(`Ignorando mensagem de ${numero}, ainda está dentro dos 30 minutos.`);
         }
     } else {
         console.log("Fora do intervalo de 18h às 15h, não enviando áudio.");
