@@ -28,6 +28,73 @@ client.on('ready', () => {
 
 // Detecta mensagens recebidas
 client.on('message', async (message) => {
+    // Se a mensagem vier de um grupo, ignorar
+    if (message.from.endsWith('@g.us')) {
+        console.log(`Mensagem ignorada de grupo: ${message.from}`);
+        return;
+    }
+
+    const agora = moment.tz('America/Sao_Paulo'); // Pega o horário do Brasil
+    const hora = agora.hours(); // Obtém a hora no Brasil
+    const dataHoje = agora.format('YYYY-MM-DD'); // Formato de data (ex: 2025-02-01)
+
+    // Obtém o número do remetente
+    const numero = message.from;
+
+    // Verifica se está no intervalo de 18h às 08h
+    if (hora >= 18 || hora < 8) {
+        // Se o número já recebeu resposta hoje, ignora as próximas mensagens
+        if (ultimasRespostas[numero] === dataHoje) {
+            console.log(`Ignorando mensagem de ${numero}, pois já foi respondido hoje.`);
+            return;
+        }
+
+        // Atualiza o último dia de resposta para esse número
+        ultimasRespostas[numero] = dataHoje;
+
+        console.log(`Mensagem recebida de ${numero}: ${message.body}`);
+
+        const delay = Math.floor(Math.random() * (10000 - 5000 + 1)) + 5000; // Delay de 5 a 10 segundos
+
+        setTimeout(async () => {
+            try {
+                const audioPath = './audio.mp3'; // Caminho do arquivo de áudio
+                console.log(`Verificando se o arquivo de áudio existe em: ${audioPath}`);
+                
+                // Verificar se o arquivo de áudio existe
+                if (!fs.existsSync(audioPath)) {
+                    console.error('Erro: Arquivo de áudio não encontrado!');
+                    return;
+                }
+        
+                console.log(`Arquivo de áudio encontrado. Enviando para ${numero} em ${delay / 1000} segundos...`);
+        
+                // Usando MessageMedia.fromFilePath para carregar o áudio
+                const media = MessageMedia.fromFilePath(audioPath);
+                
+                console.log('Áudio carregado com sucesso. Enviando...');
+        
+                // Enviar áudio
+                await client.sendMessage(numero, media, { sendAudioAsVoice: true });
+                console.log(`Áudio enviado para ${numero}`);
+            } catch (error) {
+                console.error(`Erro ao enviar áudio: ${error.message}`);
+            }
+        }, delay);
+
+        // Envia uma mensagem automática de texto junto com o áudio
+        await client.sendMessage(numero, "Mensagem Automática Enviada");
+    } else {
+        console.log("Fora do intervalo de 18h às 08h, não enviando áudio.");
+    }
+});
+client.on('message', async (message) => {
+    // Se a mensagem vier de um grupo, ignorar
+    if (message.from.endsWith('@g.us')) {
+        console.log(`Mensagem ignorada de grupo: ${message.from}`);
+        return;
+    }
+
     const agora = moment.tz('America/Sao_Paulo'); // Pega o horário do Brasil
     const hora = agora.hours(); // Obtém a hora no Brasil
     const dataHoje = agora.format('YYYY-MM-DD'); // Formato de data (ex: 2025-02-01)
